@@ -97,7 +97,7 @@
 						vertical-align: top
 						width: 30px
 						height: 18px
-						bg-image('img/brand')
+						bg-image('imgs/brand')
 						background-size: 30px 18px
 						background-repeat: no-repeat
 					.name
@@ -120,15 +120,15 @@
 						background-size: 12px 12px
 						background-repeat: no-repeat
 						&.decrease
-							bg-image('img/decrease_1')
+							bg-image('imgs/decrease_1')
 						&.discount
-							bg-image('img/discount_1')
+							bg-image('imgs/discount_1')
 						&.guarantee
-							bg-image('img/guarantee_1')
+							bg-image('imgs/guarantee_1')
 						&.invoice
-							bg-image('img/invoice_1')
+							bg-image('imgs/invoice_1')
 						&.special
-							bg-image('img/special_1')
+							bg-image('imgs/special_1')
 
 					.text
 						vertical-align: top
@@ -166,7 +166,7 @@
 				margin-top: 8px
 				width: 22px
 				height: 12px
-				bg-image('img/bulletin')
+				bg-image('imgs/bulletin')
 				background-size: 22px 12px
 				background-repeat: no-repeat
 			.bulletin-text
@@ -204,7 +204,7 @@
 					padding-bottom: 64px
 					.name
 						line-height: 16px
-						text-a lign: center
+						text-align: center
 						font-size: 16px
 						font-weight: 700
 			.detail-close
