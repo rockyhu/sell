@@ -1,0 +1,25 @@
+// $color表示边框的颜色，$bottom表示边框的类型，为true表示下边框，为false表示上边框
+border-1px($color, $bottom = true)
+  position: relative
+  if $bottom
+    &::after
+      box-border($color)
+      bottom: 0
+  else
+    &::before
+      box-border($color)
+      top: 0
+
+box-border($color)
+  display: block
+  position: absolute
+  left: 0
+  width: 100%
+  border-top: 1px solid $color
+  content: ''
+
+// 正常情况下都采用2x图片，当在pixel-ratio为3的设备下，采用3x图片
+bg-image($url)
+  background-image: url($url + "@2x.png")
+  @media (-webkit-min-device-pixel-ratio: 3),(min-device-pixel-ratio: 3)
+    background-image: url($url + "@3x.png")
