@@ -18,6 +18,15 @@ box-border($color)
   border-top: 1px solid $color
   content: ''
 
+// 去掉1px边框,$bottom表示边框的类型，为true表示下边框，为false表示上边框
+border-none($bottom = true)
+  if $bottom
+    &::after
+      display: none
+  else
+    &::before
+      display: none
+
 // 正常情况下都采用2x图片，当在pixel-ratio为3的设备下，采用3x图片
 bg-image($url)
   background-image: url($url + "@2x.png")
