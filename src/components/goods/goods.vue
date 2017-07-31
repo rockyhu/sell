@@ -33,6 +33,11 @@
 									<span class="now">￥{{food.price}}</span><span class="old"
 																				  v-show="food.oldPrice">￥{{food.oldPrice}}</span>
 								</div>
+								<div class="cartcontrol-wrapper">
+									<!-- 商品添加到购物车 -->
+									<!-- 监听子组件的add事件,子组件的add方法通过this.$emit('add', event.target)触发 -->
+									<cartcontrol @add="addFood" :food="food"></cartcontrol>
+								</div>
 							</div>
 						</li>
 					</ul>
@@ -41,13 +46,15 @@
 		</div>
 		<!-- 购物车组件 -->
 		<!-- camelCased (驼峰式) 命名的 prop 需要转换为相对应的 kebab-case (短横线隔开式) 命名，子组件接收采用camelCased (驼峰式)即可 -->
-		<shopcart :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
+		<shopcart ref="shopcart" :select-foods="selectFoods" :delivery-price="seller.deliveryPrice"
+				  :min-price="seller.minPrice"></shopcart>
 	</div>
 </template>
 
 <script type="text/ecmascript-6">
 	import BScroll from 'better-scroll';
 	import shopcart from '@/components/shopcart/shopcart';
+	import cartcontrol from '@/components/cartcontrol/cartcontrol';
 
 	// 错误代码常量定义
 	const ERR_NO = 0;
@@ -55,7 +62,8 @@
 	export default {
 		// 注册组件
 		components: {
-			shopcart
+			shopcart,
+			cartcontrol
 		},
 		// 接收父组件传送过来的参数数据
 		props: {
@@ -89,6 +97,22 @@
 					}
 				}
 				return 0;
+			},
+			// 选择了多少商品
+			selectFoods() {
+				let foods = [];
+				// 遍历goods商品数组
+				this.goods.forEach((good) => {
+					// 遍历商品下的food数组
+					good.foods.forEach((food) => {
+						// 如果food.count大于0的话，说明这个产品需要添加到购物车foods数组中
+						// food.count是通过cartcontrol子组件进行设置的
+						if (food.count) {
+							foods.push(food);
+						}
+					});
+				});
+				return foods;
 			}
 		},
 		// 钩子 - created,实例已经创建完成之后被调用
@@ -102,6 +126,7 @@
 				let goodsRes = response.body;
 				// 状态进行判断
 				if (goodsRes.errno === ERR_NO) {
+					// 赋值到goods属性上
 					this.goods = goodsRes.data;
 					// 将回调延迟到下次 DOM 更新循环之后执行。在修改数据之后立即使用它，然后等待 DOM 更新。
 					this.$nextTick(function () {
@@ -127,7 +152,9 @@
 					// 2 在手指 move 的时候也会实时派发 scroll 事件，不会截流。
 					// 3 除了手指 move 的时候派发scroll事件，在 swipe（手指迅速滑动一小段距离）的情况下，列表会有一个长距离的滚动动画，这个滚动的动画过程中也会实时派发滚动事件
 					// 希望能够返回实时滚动的位置
-					probeType: 3
+					probeType: 3,
+					// 是否派发click事件
+					click: true
 				});
 
 				// 监听滚动事件，能够实时获取到滚动的位置
@@ -161,6 +188,15 @@
 				let el = foodList[index];
 				// 应用better-scroll组件的scrollToElement方法，滚动到某个元素
 				this.foodsScroll.scrollToElement(el, 300);
+			},
+			// 父组件实现添加商品到购物车的方法
+			addFood(target) {
+				this._drop(target);
+			},
+			//
+			_drop(target) {
+				// 访问shopcart子组件的drop方法
+				this.$refs.shopcart.drop(target);
 			}
 		}
 	};
@@ -272,4 +308,8 @@
 							font-size: 10px
 							color: rgb(147, 153, 159)
 
+					.cartcontrol-wrapper
+						position: absolute
+						right: 0
+						bottom: 12px
 </style>
