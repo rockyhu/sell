@@ -14,7 +14,8 @@
 			</div>
 		</div>
 		<keep-alive>
-			<router-view></router-view>
+			<!-- 将seller参数传入子组件 -->
+			<router-view :seller="seller"></router-view>
 		</keep-alive>
 	</div>
 </template>

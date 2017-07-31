@@ -39,16 +39,24 @@
 				</li>
 			</ul>
 		</div>
+		<!-- 购物车组件 -->
+		<!-- camelCased (驼峰式) 命名的 prop 需要转换为相对应的 kebab-case (短横线隔开式) 命名，子组件接收采用camelCased (驼峰式)即可 -->
+		<shopcart :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
 	</div>
 </template>
 
 <script type="text/ecmascript-6">
 	import BScroll from 'better-scroll';
+	import shopcart from '@/components/shopcart/shopcart';
 
 	// 错误代码常量定义
 	const ERR_NO = 0;
 
 	export default {
+		// 注册组件
+		components: {
+			shopcart
+		},
 		// 接收父组件传送过来的参数数据
 		props: {
 			seller: {
