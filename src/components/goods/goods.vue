@@ -191,10 +191,6 @@
 			},
 			// 父组件实现添加商品到购物车的方法
 			addFood(target) {
-				this._drop(target);
-			},
-			//
-			_drop(target) {
 				// 访问shopcart子组件的drop方法
 				this.$refs.shopcart.drop(target);
 			}
