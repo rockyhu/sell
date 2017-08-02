@@ -1,53 +1,58 @@
 <template>
-	<div class="goods">
-		<!-- 左侧菜单栏目 -->
-		<!-- 2.x中v-el="menu-wrapper"已经用ref="menuWrapper"进行替代 -->
-		<!-- ref 被用来给元素或子组件注册引用信息。引用信息将会注册在父组件的 $refs 对象上。如果在普通的 DOM 元素上使用，引用指向的就是 DOM 元素; 如果用在子组件上，引用就指向组件实例 -->
-		<div class="menu-wrapper" ref="menuWrapper">
-			<ul>
-				<li v-for="(item, index) in goods" class="menu-item" :class="{'current':currentIndex === index}"
-					@click="selectMenu(index, $event)">
-					<span class="text border-1px">
-						<span v-show="item.type>0" class="icon" :class="classMap[item.type]"></span>{{item.name}}
-					</span>
-				</li>
-			</ul>
+	<div class="goodswrapper">
+		<div class="goods">
+			<!-- 左侧菜单栏目 -->
+			<!-- 2.x中v-el="menu-wrapper"已经用ref="menuWrapper"进行替代 -->
+			<!-- ref 被用来给元素或子组件注册引用信息。引用信息将会注册在父组件的 $refs 对象上。如果在普通的 DOM 元素上使用，引用指向的就是 DOM 元素; 如果用在子组件上，引用就指向组件实例 -->
+			<div class="menu-wrapper" ref="menuWrapper">
+				<ul>
+					<li v-for="(item, index) in goods" class="menu-item" :class="{'current':currentIndex === index}"
+						@click="selectMenu(index, $event)">
+						<span class="text border-1px">
+							<span v-show="item.type>0" class="icon" :class="classMap[item.type]"></span>{{item.name}}
+						</span>
+					</li>
+				</ul>
+			</div>
+			<!-- 右侧菜单栏目 -->
+			<div class="foods-wrapper" ref="foodsWrapper">
+				<ul>
+					<li v-for="item in goods" class="food-list food-list-hook">
+						<h1 class="title">{{item.name}}</h1>
+						<ul>
+							<li @click="selectFood(food, $event)" v-for="food in item.foods"
+								class="food-item border-1px">
+								<div class="icon">
+									<img width="57" height="57" :src="food.icon" alt="">
+								</div>
+								<div class="content">
+									<h2 class="name">{{food.name}}</h2>
+									<p class="desc">{{food.description}}</p>
+									<div class="extra">
+										<span class="count">月售{{food.sellCount}}份</span><span>好评率{{food.rating}}%</span>
+									</div>
+									<div class="price">
+										<span class="now">￥{{food.price}}</span><span class="old"
+																					  v-show="food.oldPrice">￥{{food.oldPrice}}</span>
+									</div>
+									<div class="cartcontrol-wrapper">
+										<!-- 商品添加到购物车 -->
+										<!-- 监听子组件的add事件,子组件的add方法通过this.$emit('add', event.target)触发 -->
+										<cartcontrol @add="addFood" :food="food"></cartcontrol>
+									</div>
+								</div>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+			<!-- 购物车组件 -->
+			<!-- camelCased (驼峰式) 命名的 prop 需要转换为相对应的 kebab-case (短横线隔开式) 命名，子组件接收采用camelCased (驼峰式)即可 -->
+			<shopcart ref="shopcart" :select-foods="selectFoods" :delivery-price="seller.deliveryPrice"
+					  :min-price="seller.minPrice"></shopcart>
 		</div>
-		<!-- 右侧菜单栏目 -->
-		<div class="foods-wrapper" ref="foodsWrapper">
-			<ul>
-				<li v-for="item in goods" class="food-list food-list-hook">
-					<h1 class="title">{{item.name}}</h1>
-					<ul>
-						<li v-for="food in item.foods" class="food-item border-1px">
-							<div class="icon">
-								<img width="57" height="57" :src="food.icon" alt="">
-							</div>
-							<div class="content">
-								<h2 class="name">{{food.name}}</h2>
-								<p class="desc">{{food.description}}</p>
-								<div class="extra">
-									<span class="count">月售{{food.sellCount}}份</span><span>好评率{{food.rating}}%</span>
-								</div>
-								<div class="price">
-									<span class="now">￥{{food.price}}</span><span class="old"
-																				  v-show="food.oldPrice">￥{{food.oldPrice}}</span>
-								</div>
-								<div class="cartcontrol-wrapper">
-									<!-- 商品添加到购物车 -->
-									<!-- 监听子组件的add事件,子组件的add方法通过this.$emit('add', event.target)触发 -->
-									<cartcontrol @add="addFood" :food="food"></cartcontrol>
-								</div>
-							</div>
-						</li>
-					</ul>
-				</li>
-			</ul>
-		</div>
-		<!-- 购物车组件 -->
-		<!-- camelCased (驼峰式) 命名的 prop 需要转换为相对应的 kebab-case (短横线隔开式) 命名，子组件接收采用camelCased (驼峰式)即可 -->
-		<shopcart ref="shopcart" :select-foods="selectFoods" :delivery-price="seller.deliveryPrice"
-				  :min-price="seller.minPrice"></shopcart>
+		<!-- 商品详情页组件 -->
+		<food @add="addFood" :food="selectedFood" ref="food"></food>
 	</div>
 </template>
 
@@ -55,6 +60,7 @@
 	import BScroll from 'better-scroll';
 	import shopcart from '@/components/shopcart/shopcart';
 	import cartcontrol from '@/components/cartcontrol/cartcontrol';
+	import food from '@/components/food/food';
 
 	// 错误代码常量定义
 	const ERR_NO = 0;
@@ -63,7 +69,8 @@
 		// 注册组件
 		components: {
 			shopcart,
-			cartcontrol
+			cartcontrol,
+			food
 		},
 		// 接收父组件传送过来的参数数据
 		props: {
@@ -79,7 +86,9 @@
 				// 保存区间位置数组
 				listHeight: [],
 				// 实时保存滚动的位置
-				scrollY: 0
+				scrollY: 0,
+				// 选中的商品 - 选中商品后跳转到商品详情页
+				selectedFood: {}
 			};
 		},
 		// 计算属性
@@ -191,8 +200,21 @@
 			},
 			// 父组件实现添加商品到购物车的方法
 			addFood(target) {
-				// 访问shopcart子组件的drop方法
-				this.$refs.shopcart.drop(target);
+				// 体验优化，异步执行下落动画
+				this.$nextTick(() => {
+					// 访问shopcart子组件的drop方法
+					this.$refs.shopcart.drop(target);
+				});
+			},
+			// 点击商品时将商品设置为选中的商品
+			selectFood(food, event) {
+				if (!event._constructed) {
+					// 阻止掉原生的点击事件
+					return;
+				}
+				this.selectedFood = food;
+				// 调用food子组件的show方法
+				this.$refs.food.show();
 			}
 		}
 	};
