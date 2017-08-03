@@ -32,7 +32,27 @@
 				<split></split>
 				<div class="rating">
 					<h1 class="title">商品评价</h1>
-					<ratingselect :ratings="food.ratings" :select-type="selectType" :only-content="onlyContent" :desc="desc"></ratingselect>
+					<ratingselect @ratingTypeSelect="ratingTypeSelect" @contentToggle="contentToggle"
+								  :ratings="food.ratings" :select-type="selectType" :only-content="onlyContent"
+								  :desc="desc"></ratingselect>
+					<div class="rating-wrapper">
+						<ul v-show="food.ratings && food.ratings.length">
+							<!-- v-show可以绑定一个函数方法进行条件处理 -->
+							<li v-for="rating in food.ratings" class="rating-item border-1px"
+								v-show="needShow(rating.rateType,rating.text)">
+								<div class="user">
+									<span class="username">{{rating.username}}</span>
+									<img :src="rating.avatar" width="12" height="12" alt="" class="avatar">
+								</div>
+								<!-- 格式化日期 -->
+								<div class="time">{{rating.rateTime | formateDate}}</div>
+								<p class="text">
+									<span :class="{'icon-thumb_up':rating.rateType===0,'icon-thumb_down':rating.rateType===1}"></span>{{rating.text}}
+								</p>
+							</li>
+						</ul>
+						<div class="no-rating" v-show="!food.ratings || !food.ratings.length">暂无评价</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -42,6 +62,8 @@
 <script type="text/ecmascript-6">
 	import Vue from 'vue';
 	import BScroll from 'better-scroll';
+	// 采用export方式导出的需要{}，采用export default方式导出的不需要{}
+	import {formateDate} from '@/common/js/date';
 	import cartcontrol from '@/components/cartcontrol/cartcontrol';
 	import split from '@/components/split/split';
 	import ratingselect from '@/components/ratingselect/ratingselect';
@@ -117,12 +139,48 @@
 					// 通过this.$parent访问父组件
 					this.$parent.addFood(target);
 				});
+			},
+			// 点击筛选数据 && 只看有内容的评价
+			needShow(type, text) {
+				if (this.onlyContent && !text) {
+					return false;
+				}
+				if (this.selectType === ALL) {
+					return true;
+				} else {
+					return type === this.selectType;
+				}
+			},
+			// 监听子组件的评论类型筛选时间
+			ratingTypeSelect(type) {
+				this.selectType = type;
+				this.$nextTick(() => {
+					// 解决评论列表的内容隐藏在footer下面
+					this.scroll.refresh();
+				});
+			},
+			// 监听子组件的只看有内容的评价的切换
+			contentToggle(onlyContent) {
+				this.onlyContent = !onlyContent;
+				this.$nextTick(() => {
+					// 解决评论列表的内容隐藏在footer下面
+					this.scroll.refresh();
+				});
+			}
+		},
+		// 过滤属性
+		filters: {
+			// 格式化日期
+			formateDate(time) {
+				let date = new Date(time);
+				return formateDate(date, 'yyyy-MM-dd hh:mm');
 			}
 		}
 	};
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">
+	@import "../../common/stylus/mixin.styl"
 	// 通过hegiht:0和padding-top:100%这个魔法来实现容器的高度固定
 	.food
 		position: fixed
@@ -233,4 +291,45 @@
 				margin-left: 18px
 				font-size: 14px
 				color: rgb(7, 17, 27)
+			.rating-wrapper
+				padding: 0 18px;
+				.rating-item
+					position: relative
+					padding: 16px 0
+					border-1px(rgba(7, 17, 27, 0.1))
+					.user
+						position: absolute
+						right: 0
+						top: 16px
+						line-height: 12px
+						font-size: 0
+						.username
+							display: inline-block
+							margin-right: 6px
+							vertical-align: top
+							font-size: 10px
+							color: rgb(147, 153, 159)
+						.avatar
+							border-radius: 50%
+					.time
+						margin-bottom: 6px
+						line-height: 12px
+						font-size: 10px
+						color: rgb(147, 153, 159)
+					.text
+						line-height: 16px
+						font-size: 12px
+						color: rgb(7, 17, 27)
+						.icon-thumb_up, .icon-thumb_down
+							margin-right: 4px
+							line-height: 16px
+							font-size: 12px
+						.icon-thumb_up
+							color: rgb(0, 160, 220)
+						.icon-thumb_down
+							color: rgb(147, 153, 159)
+				.no-rating
+					padding: 16px 0
+					font-size: 12px
+					color: rgb(147, 153, 159)
 </style>
