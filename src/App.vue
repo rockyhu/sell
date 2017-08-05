@@ -22,6 +22,7 @@
 
 <script type="text/ecmascript-6">
 	import header from '@/components/header/header';
+	import {urlParse} from '@/common/js/util';
 
 	// 错误代码常量定义
 	const ERR_NO = 0;
@@ -30,17 +31,25 @@
 		// 数据
 		data() {
 			return {
-				seller: {}
+				seller: {
+					// 匿名自动执行函数
+					id: (() => {
+						let queryParam = urlParse();
+						return queryParam.id;
+					})()
+				}
 			};
 		},
 		// 钩子 - created,实例已经创建完成之后被调用
 		created() {
-			this.$http.get('/api/seller').then((response) => {
+			this.$http.get('/api/seller?id=' + this.seller.id).then((response) => {
 				// 请求成功的回调函数
 				let sellerRes = response.body;
 				// 状态进行判断
 				if (sellerRes.errno === ERR_NO) {
-					this.seller = sellerRes.data;
+					// ES6新方法，给this.seller添加sellerRes.data属性，然后返回
+					// 采用这种方式this.seller.id不会被覆盖掉
+					this.seller = Object.assign({}, this.seller, sellerRes.data);
 				}
 			}, (response) => {
 				// 请求失败的回调函数

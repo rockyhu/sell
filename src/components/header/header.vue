@@ -91,7 +91,7 @@
 				this.detailShow = false;
 			}
 		},
-		// 声明周期 - 钩子
+		// 生命周期 - 钩子
 		created() {
 			// 创建classMap数据
 			this.classMap = ['decrease', 'discount', 'special', 'invoice', 'guarantee'];
