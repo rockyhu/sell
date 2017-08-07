@@ -76,7 +76,7 @@
 				// 子组件定义的基础类型的改变不会影响到父组件
 				// 子组件的参数发生改变后，要通知父组件参数改变：
 				// 需要通过触发一个事件，然后父组件绑定事件方法，并实现
-				this.$emit('contentToggle', this.onlyContent);
+				this.$emit('contentToggle');
 			}
 		},
 		// 计算属性

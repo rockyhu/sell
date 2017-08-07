@@ -160,8 +160,8 @@
 				});
 			},
 			// 监听子组件的只看有内容的评价的切换
-			contentToggle(onlyContent) {
-				this.onlyContent = !onlyContent;
+			contentToggle() {
+				this.onlyContent = !this.onlyContent;
 				this.$nextTick(() => {
 					// 解决评论列表的内容隐藏在footer下面
 					this.scroll.refresh();
