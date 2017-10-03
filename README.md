@@ -152,6 +152,4 @@ methods: {
 
 
 ### better-scroll插件应用
-``` javascript
-
-```
+https://github.com/ustbhuangyi/better-scroll
